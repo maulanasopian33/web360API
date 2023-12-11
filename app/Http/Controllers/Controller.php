@@ -19,7 +19,7 @@ class Controller extends BaseController
         $validator = app('validator')->make($req->all(), $rules);
         // Cek validasi
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400); // Jika validasi gagal, kembalikan pesan error
+            return response()->json(['status'  => false,'errors' => $validator->errors()]); // Jika validasi gagal, kembalikan pesan error
         }
         // Pastikan folder ada atau buat jika belum ada
         if (!file_exists($folderPath)) {
@@ -31,16 +31,19 @@ class Controller extends BaseController
         // Tulis konten ke dalam file
         file_put_contents($filePath, $content);
 
-        return response()->json(['message' => 'Scene berhasil di tambahkan']);
+        return response()->json([
+            'status'  => true,
+            'message' => 'Scene berhasil di tambahkan'
+        ]);
     }
     public function upload(Request $req){
         if ($req->hasFile('image')) {
             $image = $req->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(storage_path('images'), $imageName);
-            return response()->json(['message' => 'Gambar berhasil diunggah!', 'image_name' => $imageName, 'url' => url('/storage/images/' . $imageName)], 200);
+            return response()->json(['status'  => true,'message' => 'Gambar berhasil diunggah!', 'image_name' => $imageName, 'url' => url('/storage/images/' . $imageName)], 200);
         } else {
-            return response()->json(['message' => 'Gambar tidak ditemukan!'], 400);
+            return response()->json(['status'  => false,'message' => 'Gambar tidak ditemukan!']);
         }
     }
     public function  getfiles(){
@@ -57,9 +60,9 @@ class Controller extends BaseController
                     ];
                 }
             }
-            return response()->json(['files' => $fileList], 200);
+            return response()->json(['status'  => true,'files' => $fileList], 200);
         } else {
-            return response()->json(['message' => 'Direktori tidak ditemukan'], 404);
+            return response()->json(['status'  => false,'message' => 'Direktori tidak ditemukan']);
         }
     }
     public function get($scene){
@@ -71,7 +74,10 @@ class Controller extends BaseController
                 'content' => json_decode($content)
             ]);
         } else {
-            return response()->json(['message' => 'scene tidak ditemukan.'],404);
+            return response()->json([
+                'status'  => false,
+                'message' => 'scene tidak ditemukan.'
+            ]);
         }
     }
     public function delete($scene){
@@ -82,9 +88,9 @@ class Controller extends BaseController
             // Menghapus file
             unlink($filePath);
 
-            return response()->json(['message' => 'scene berhasil dihapus'], 200);
+            return response()->json(['status'  => true,'message' => 'scene berhasil dihapus']);
         } else {
-            return response()->json(['message' => 'scene tidak ditemukan'], 404);
+            return response()->json(['status'  => false,'message' => 'scene tidak ditemukan']);
         }
     }
 }

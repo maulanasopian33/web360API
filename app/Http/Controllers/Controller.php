@@ -71,6 +71,7 @@ class Controller extends BaseController
         if (file_exists($filePath)) {
             $content = file_get_contents($filePath);
             return response()->json([
+                'status'  => true,
                 'content' => json_decode($content)
             ]);
         } else {

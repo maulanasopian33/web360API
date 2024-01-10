@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
 class Controller extends BaseController
@@ -92,6 +94,28 @@ class Controller extends BaseController
             return response()->json(['status'  => true,'message' => 'scene berhasil dihapus']);
         } else {
             return response()->json(['status'  => false,'message' => 'scene tidak ditemukan']);
+        }
+    }
+
+    public function login(Request $req){
+        $user = User::where('email', $req->email)->get();
+        if(count($user) > 0){
+            if(Hash::check($req->password, $user[0]->password)){
+                return response()->json([
+                    'status' => true,
+                    'data'   => 'berhasil login'
+                ]);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'data'   => 'password salah'
+                ]);
+            }
+        }else{
+            return response()->json([
+                'status' => false,
+                'data'   => 'username tidak ditemukan'
+            ]);
         }
     }
 }
